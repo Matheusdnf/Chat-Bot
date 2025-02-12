@@ -31,27 +31,25 @@ def Bot (memoria,chat):
 
 
 def informação_de_sites(url_site, memoria):
-    # Carregar o conteúdo da página com requests
     print(f"Carregando a página: {url_site}")
     response = requests.get(url_site)
     
-    # Garantir que a requisição foi bem-sucedida
-
     # posso adicioanr um bloco try exception -> erro que dará requests.exceptions.HTTPError
-    if (response.status_code == 200):
-        print(response)
-        content = response.text  
-        print(content)
-        print(f"Conteúdo da página carregado com sucesso.")
-    else:
-        print(f"Falha ao carregar a página, status code: {response.status_code}")
-        # ver oq pode ser melhor nesse caso tenha dado error 
-        return []
+    try:
+        if (response.status_code == 200):
+            print(response)
+            content = response.text  
+            print(content)
+            print("Acesso a informação conseguida com sucesso.")
+    except requests.exceptions.HTTPError as e:
+            print("Erro na requizição {e}")
+    finally:
+        print("Falha ao fazer o carregamento da página")
 
     # Parse com BeautifulSoup
     soup = BeautifulSoup(content, 'html.parser')
 
-    # Encontrando as tags <main> e <body>
+    # Encontrando as tags <main> 
     main_content = soup.find('main')  # Busca a tag <main>
 
     # Lista para armazenar o conteúdo extraído
@@ -71,23 +69,16 @@ def informação_de_sites(url_site, memoria):
         # Extrair e retornar o texto limpo
         return tag.get_text(separator=" ", strip=True)
 
-    # Verifica se a tag <main> foi encontrada e processa o texto
     if main_content:
         print("Conteúdo da tag <main> encontrado:")
         info_site.append(clean_text(main_content))  # Extraí o texto limpo da tag <main>
     else:
         print("Tag <main> não encontrada.")
 
-    # Verifica se a tag <body> foi encontrada e processa o texto
 
-
-    # Adicionando as informações ao vetor 'memoria'
     memoria += info_site
 
-    # Exibir o conteúdo final processado
-    print(f"\nConteúdo completo processado (apenas texto limpo):")
-    for i, chunk in enumerate(info_site):  # Exibe todo o conteúdo processado
-        print(f"Texto Extraído (Chunk {i}):\n{chunk}\n")
-    
-    return info_site
+    # print(f"\nConteúdo completo processado (apenas texto limpo):")
+    # for i, chunk in enumerate(info_site):  # Exibe todo o conteúdo processado
+    #     print(f"Texto Extraído (Chunk {i}):\n{chunk}\n")
 
